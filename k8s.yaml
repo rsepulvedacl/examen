@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpinfo
+  labels:
+    app: phpinfo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: phpinfo
+  template:
+    metadata:
+      labels:
+        app: phpinfo
+    spec:
+      containers:
+      - name: phpinfo
+        image: php:8.2-apache
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: index-mnt
+            mountPath: /var/www/html/index.php
+            subPath: index
+      volumes:
+      - name: index-mnt
+        configMap:
+          name: phpinfo-configmap
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: phpinfo-configmap
+data:
+  index: |
+    <?php phpinfo();
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpinfo-svc
+  labels:
+    app: phpinfo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: phpinfo
