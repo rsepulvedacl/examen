@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holamundo
+  labels:
+    app: holamundo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: holamundo
+  template:
+    metadata:
+      labels:
+        app: holamundo
+    spec:
+      containers:
+      - name: holamundo
+        image: ghcr.io/rsepulvedacl/examen
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holamundo-svc
+  labels:
+    app: holamundo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: holamundo
